@@ -7,14 +7,21 @@ import java.net.*;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Iterator;
+import java.io.*;
 
 /**
  *
  * @author akhil
  */
-public class DummyClient
+class Client extends Thread
 {
-    public static void main(String args[])
+    private int serialNo;
+
+    public Client(int serialNo) {
+     this.serialNo = serialNo;
+    }
+
+    public void run()
     {
         Socket sc = null;
         try
@@ -30,13 +37,34 @@ public class DummyClient
 
             Set<String> keys = output.keySet();
 
-            System.out.println("Output from Server");
+            System.out.println("Client No : " + serialNo + " --> Output from Server");
             for (String key : keys)
                 System.out.println(" Key : " + key + "\t" + " Value : " + (Integer)output.get(key));
+            System.out.println("*********************************");
         }
         catch(Exception e)
         {
             e.printStackTrace();
         }
     }
+}
+
+public class DummyClient {
+ public static void main(String args[]) {
+  try {
+   int num = Integer.parseInt(args[0]);
+   Client d[] = new Client[num];
+   for (int x = 1; x <= num; x++) {
+    d[x - 1] = new Client(x);
+   }
+   System.out.println(num + " clients created. Waiting for you to type start...");
+   BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+   String input = "";
+   while (!(input = br.readLine()).equalsIgnoreCase("start"));
+   for (int y = 1; y <= num; y++)
+    d[y - 1].start();
+  } catch(Exception e) {
+   e.printStackTrace();
+  }
+ }
 }

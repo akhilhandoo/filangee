@@ -21,34 +21,36 @@ public class FilangeeProcessorManager
         processorPool = new FilangeeProcessor[numProcessors];
     }
 
-    public synchronized FilangeeProcessor getProcessor()
+    public FilangeeProcessor getProcessor()
     {
-        FilangeeProcessor processor = null;
+        synchronized(instance) {
+            FilangeeProcessor processor = null;
 
-        int counter = 0;
+            int counter = 0;
 
-        for (FilangeeProcessor temp : processorPool)
-        {
-
-            if (null == temp)
+            for (FilangeeProcessor temp : processorPool)
             {
-                processorPool[counter] = new FilangeeProcessor("" + counter);
-                processor = processorPool[counter];
-                break;
+
+                if (null == temp)
+                {
+                    processorPool[counter] = new FilangeeProcessor("" + counter);
+                    processor = processorPool[counter];
+                    break;
+                }
+
+                if (temp.isAvailable())
+                {
+                    processor = temp;
+                    break;
+                }
+
+                counter++;
             }
 
-            if (temp.isAvailable())
-            {
-                processor = temp;
-                break;
-            }
-
-            counter++;
+            if (processor == null)
+                return(null);
+            else
+                return(processor);
         }
-
-        if (processor == null)
-            return(null);
-        else
-            return(processor);
     }
 }
